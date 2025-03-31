@@ -81,6 +81,15 @@ gulp.task('gen-simulator', async function () {
             args.push('Xcode');
             args.push(`-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64`);
         }
+
+        if (process.env.SPINE_VERSION === '3.8') {
+            args.push('-DUSE_SPINE_3_8=ON')
+            args.push('-DUSE_SPINE_4_2=OFF')
+        } else if (process.env.SPINE_VERSION === '4.2') {
+            args.push('-DUSE_SPINE_3_8=OFF')
+            args.push('-DUSE_SPINE_4_2=ON')
+        }
+
         args.push('-DCC_DEBUG_FORCE=ON','-DUSE_V8_DEBUGGER_FORCE=ON');
         args.push(absolutePath('./tools/simulator/frameworks/runtime-src/'));
         const newEnv = {};
@@ -161,6 +170,8 @@ gulp.task('clean-simulator', async function () {
     ];
     if (isWin32) {
         delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/cocos_engine.lib')));
+        delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/simulator.lib')));
+        delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/SimulatorApp-Win32.lib')));
     } else {
         delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/libsimulator.a')));
     }

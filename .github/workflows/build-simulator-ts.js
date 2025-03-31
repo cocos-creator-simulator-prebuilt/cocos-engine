@@ -10,12 +10,7 @@ if (args.length < 3) {
     process.exit(1);
 }
 
-const excludesFeatures = [];
-
-for (let i = 2; i < args.length; ++i) {
-    console.log(`==> Exclude: ${args[i]}`);
-    excludesFeatures.push(args[i]);
-}
+const spineVersion = args[2];
 
 function excludeFeatures(features, exclude) {
     return features.filter((feature) => !exclude.includes(feature));
@@ -36,7 +31,10 @@ function excludeFeatures(features, exclude) {
 
     const statsQuery = await StatsQuery.create(engineDir);
 
-    const allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgl', 'gfx-webgl2', 'gfx-empty', 'gfx-webgpu', 'vendor-google', ...excludesFeatures]);
+    allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgl', 'gfx-webgl2', 'gfx-empty', 'gfx-webgpu', 'vendor-google']);
+    allFeatures = allFeatures.filter((feature) => !feature.startsWith('spine-'))
+
+    allFeatures.push(spineVersion);
 
     console.log(`-----------------------------------------------`);
     console.log(`==> features: ${allFeatures.join(', \n')}`);

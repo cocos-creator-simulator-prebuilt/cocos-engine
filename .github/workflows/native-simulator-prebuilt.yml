@@ -8,6 +8,13 @@ on:
 jobs:
   build_simulator_ts:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { spine: spine-3.8 }
+          - { spine: spine-4.2 }
+
     steps:
       - uses: actions/checkout@v4
       - name: Download external libraries
@@ -22,18 +29,24 @@ jobs:
           rm -rf bin
           mkdir bin
           cd .github/workflows
-          node build-simulator-ts.js spine-4.2
+          node build-simulator-ts.js ${{ matrix.config.spine }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
-          name: native-preview
+          name: native-preview-${{ matrix.config.spine }}
           path: bin
 
   win_gen_simulator:
     runs-on: windows-2019
     name: Windows
-
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { spine: 3.8 }
+          - { spine: 4.2 }
+          
     steps:
       - uses: actions/checkout@v4
       - name: npm install
@@ -56,7 +69,7 @@ jobs:
       - name: gen simulator
         run: |
           cd native
-          npx gulp gen-simulator-release
+          SPINE_VERSION=${matrix.config.spine} npx gulp gen-simulator-release
       - name: check result
         shell: bash
         run: |
@@ -65,13 +78,18 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
-          name: SimulatorApp-Win32
+          name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
           path: native/simulator/Release
 
   mac_gen_simulator:
     runs-on: macos-latest
     name: MacOS
-
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { spine: 3.8 }
+          - { spine: 4.2 }
     steps:
       - uses: actions/checkout@v4
       - name: npm install
@@ -87,7 +105,7 @@ jobs:
       - name: gen simulator
         run: |
           cd native
-          npx gulp gen-simulator-release
+          SPINE_VERSION=${matrix.config.spine} npx gulp gen-simulator-release
 
       - name: check result
         run: |
@@ -102,34 +120,40 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
-          name: SimulatorApp-Mac
+          name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
           path: native/simulator/Release
 
   release_package:
     if: github.event_name == 'release'
     name: "Release packages"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { spine: 3.8 }
+          - { spine: 4.2 }
     permissions:
       contents: write
     needs: [build_simulator_ts, win_gen_simulator, mac_gen_simulator]
     steps:
-    - name: Download android Artifacts (android-armeabi-v7a)
+    - name: Download native-preview-spine-${{ matrix.config.spine }}
       uses: actions/download-artifact@v4
       with:
-        name: native-preview
-        path: artifacts/native-preview
+        name: native-preview-spine-${{ matrix.config.spine }}
+        path: artifacts/native-preview-spine-${{ matrix.config.spine }}
 
-    - name: Download android Artifacts (android-arm64-v8a)
+    - name: Download SimulatorApp-Win32-spine-${{ matrix.config.spine }}
       uses: actions/download-artifact@v4
       with:
-        name: SimulatorApp-Win32
-        path: artifacts/SimulatorApp-Win32
+        name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
+        path: artifacts/SimulatorApp-Win32-spine-${{ matrix.config.spine }}
 
-    - name: Download android Artifacts (android-x86)
+    - name: Download SimulatorApp-Mac-spin-${{ matrix.config.spine }}
       uses: actions/download-artifact@v4
       with:
-        name: SimulatorApp-Mac
-        path: artifacts/SimulatorApp-Mac
+        name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
+        path: artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}
 
     - name: Pack dist files
       if: github.event_name == 'release'
@@ -138,13 +162,13 @@ jobs:
         type: 'zip'
         directory: 'artifacts'
         path: '.'
-        filename: 'cocos-creator-simulator-${{ github.event.release.tag_name }}.zip'
+        filename: 'cocos-creator-simulator-${{ github.event.release.tag_name }}-spine-${{ matrix.config.spine }}.zip'
 
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: artifacts/cocos-creator-simulator-${{ github.event.release.tag_name }}.zip
-        asset_name: cocos-creator-simulator-${{ github.event.release.tag_name }}.zip
+        file: artifacts/cocos-creator-simulator-${{ github.event.release.tag_name }}-spine-${{ matrix.config.spine }}.zip
+        asset_name: cocos-creator-simulator-${{ github.event.release.tag_name }}-spine-${{ matrix.config.spine }}.zip
         tag: ${{ github.ref }}
