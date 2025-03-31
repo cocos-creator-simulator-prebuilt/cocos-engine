@@ -33,20 +33,19 @@ jobs:
   win_gen_simulator:
     runs-on: windows-2019
     name: Windows
-    defaults:
-      run:
-        working-directory: ${{github.workspace}}/native
 
     steps:
       - uses: actions/checkout@v4
       - name: npm install
         run: |
+          cd native
           npm install
+
       - name: Download external libraries
         shell: bash
         run: |
           EXT_VERSION=`node ../.github/workflows/get-native-external-version.js`
-          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external external
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external native/external
 
       - name: Install deps
         uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
@@ -56,40 +55,43 @@ jobs:
           vulkan-use-cache: false
       - name: gen simulator
         run: |
-          npx gulp gen-simulator
+          cd native
+          npx gulp gen-simulator-release
       - name: check result
         shell: bash
         run: |
-          ls -l ./simulator/Release
+          ls -l ./native/simulator/Release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Win32
-          path: ./simulator/Release
+          path: native/simulator/Release
 
   mac_gen_simulator:
     runs-on: macos-latest
     name: MacOS
-    defaults:
-      run:
-        working-directory: ${{github.workspace}}/native
+
     steps:
       - uses: actions/checkout@v4
       - name: npm install
         run: |
+          cd native
           npm install
-          npm install gulp -g
+
       - name: Download external libraries
         run: |
           EXT_VERSION=`node ../.github/workflows/get-native-external-version.js`
-          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external external
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external native/external
 
       - name: gen simulator
         run: |
+          cd native
           npx gulp gen-simulator-release
+
       - name: check result
         run: |
+          cd native
           ls -l ./simulator/Release
           rm -rf ./simulator/Release/*.a
           find ./ -name SimulatorApp-Mac
@@ -101,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Mac
-          path: ./simulator/Release
+          path: native/simulator/Release
 
   release_package:
     if: github.event_name == 'release'

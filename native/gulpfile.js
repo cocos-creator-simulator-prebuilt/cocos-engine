@@ -159,7 +159,9 @@ gulp.task('clean-simulator', async function () {
         formatPath(Path.join(__dirname, './simulator/*')),
         formatPath(`!${Path.join(__dirname, './simulator/Release')}`),
     ];
-    if (!isWin32) {
+    if (isWin32) {
+        delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/cocos_engine.lib')));
+    } else {
         delPatterns.push(formatPath(Path.join(__dirname, './simulator/Release/libsimulator.a')));
     }
     console.log('delete patterns: ', JSON.stringify(delPatterns, undefined, 2));
