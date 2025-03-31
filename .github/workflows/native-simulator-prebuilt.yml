@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm install
       - name: Download external libraries
-        shell: bash
         run: |
           EXT_VERSION=`node .github/workflows/get-native-external-version.js`
-          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external external
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos/cocos-engine-external native/external
+
+      - run: npm install
 
       - name: Build Simulator TS files to JS
         run: |
           cd .github/workflows
-          node build-simulator-ts.js
+          node build-simulator-ts.js spine-4.2
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

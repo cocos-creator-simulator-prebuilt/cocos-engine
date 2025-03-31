@@ -1,12 +1,21 @@
 const { join, normalize } = require('path');
 const { ensureDir, emptyDir } = require('fs-extra');
-const { magenta } = require('chalk');
 
 const { buildEngine, StatsQuery } = require('@cocos/ccbuild');
 
+const args = process.argv;
 
-const USE_SPINE_38 = true;
+if (args.length < 3) {
+    console.error(`==> exclude modules were not passed in!`);
+    process.exit(1);
+}
 
+const excludesFeatures = [];
+
+for (let i = 2; i < args.length; ++i) {
+    console.log(`==> Exclude: ${args[i]}`);
+    excludesFeatures.push(args[i]);
+}
 
 function excludeFeatures(features, exclude) {
     return features.filter((feature) => !exclude.includes(feature));
@@ -27,8 +36,7 @@ function excludeFeatures(features, exclude) {
 
     const statsQuery = await StatsQuery.create(engineDir);
 
-    let excludedSpine = USE_SPINE_38 ? 'spine-4.2' : 'spine-3.8';
-    const allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgl', 'gfx-webgl2', 'gfx-empty', 'gfx-webgpu', 'vendor-google', excludedSpine]);
+    const allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgl', 'gfx-webgl2', 'gfx-empty', 'gfx-webgpu', 'vendor-google', ...excludesFeatures]);
 
     console.log(`-----------------------------------------------`);
     console.log(`==> features: ${allFeatures.join(', \n')}`);
