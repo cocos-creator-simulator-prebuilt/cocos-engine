@@ -31,7 +31,7 @@ function excludeFeatures(features, exclude) {
 
     const statsQuery = await StatsQuery.create(engineDir);
 
-    allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgl', 'gfx-webgl2', 'gfx-empty', 'gfx-webgpu', 'vendor-google']);
+    allFeatures = excludeFeatures(statsQuery.getFeatures(), ['gfx-webgpu', 'vendor-google']);
     allFeatures = allFeatures.filter((feature) => !feature.startsWith('spine-'))
 
     allFeatures.push(spineVersion);
