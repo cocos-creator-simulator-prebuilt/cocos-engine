@@ -123,7 +123,7 @@ jobs:
 
           cd ..
           mkdir dist
-          cp -r ./simulator/Release dist/
+          cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
