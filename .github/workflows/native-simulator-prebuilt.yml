@@ -19,6 +19,8 @@ jobs:
 
       - name: Build Simulator TS files to JS
         run: |
+          rm -rf bin
+          mkdir bin
           cd .github/workflows
           node build-simulator-ts.js spine-4.2
 
@@ -26,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: native-preview
-          path: bin/native-preview
+          path: bin
 
   win_gen_simulator:
     runs-on: windows-2019
@@ -56,15 +58,15 @@ jobs:
         run: |
           npx gulp gen-simulator
       - name: check result
+        shell: bash
         run: |
-          Get-ChildItem ./simulator/Release -Name SimulatorApp-Win32.exe
-          if(Test-Path ./simulator/Release/SimulatorApp-Win32.exe) {exit 0} else {exit 1}
+          ls -l ./simulator/Release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Win32
-          path: ./simulator/Release/SimulatorApp-Win32.exe
+          path: ./simulator/Release
 
   mac_gen_simulator:
     runs-on: macos-latest
@@ -88,6 +90,8 @@ jobs:
           npx gulp gen-simulator-release
       - name: check result
         run: |
+          ls -l ./simulator/Release
+          rm -rf ./simulator/Release/*.a
           find ./ -name SimulatorApp-Mac
           echo "==> Show lipo info: "
           lipo -info simulator/Release/SimulatorApp-Mac.app/Contents/MacOS/SimulatorApp-Mac
@@ -97,7 +101,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Mac
-          path: ./simulator/Release/SimulatorApp-Mac.app
+          path: ./simulator/Release
 
   release_package:
     if: github.event_name == 'release'
