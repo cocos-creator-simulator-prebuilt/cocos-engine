@@ -71,16 +71,19 @@ jobs:
         run: |
           cd native
           SPINE_VERSION=${{ matrix.config.spine }} npx gulp gen-simulator-release
-      - name: check result
+      
+      - name: check result and make dist
         shell: bash
         run: |
           ls -l ./native/simulator/Release
+          mkdir dist
+          cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
-          path: native/simulator/Release
+          path: dist
 
   mac_gen_simulator:
     runs-on: macos-latest
@@ -108,7 +111,7 @@ jobs:
           cd native
           SPINE_VERSION=${{ matrix.config.spine }} npx gulp gen-simulator-release
 
-      - name: check result
+      - name: check result and make dist
         run: |
           cd native
           ls -l ./simulator/Release
@@ -118,11 +121,15 @@ jobs:
           lipo -info simulator/Release/SimulatorApp-Mac.app/Contents/MacOS/SimulatorApp-Mac
           [ -f ./simulator/Release/SimulatorApp-Mac.app/Contents/MacOS/SimulatorApp-Mac ] && exit 0 || exit 1
 
+          cd ..
+          mkdir dist
+          cp -r ./simulator/Release dist/
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
-          path: native/simulator/Release
+          path: dist
 
   release_package:
     if: github.event_name == 'release'
