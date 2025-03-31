@@ -2,6 +2,8 @@ name: Gen Simulator
 
 on:
   push:
+    tags-ignore:
+      - '**'
   release:
     types: [published]
 
