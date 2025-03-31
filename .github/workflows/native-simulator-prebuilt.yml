@@ -2,9 +2,6 @@ name: Gen Simulator
 
 on:
   push:
-    paths:
-    - 'native/**'
-    - '.github\workflows\native-simulator.yml'
   release:
     types: [published]
 
