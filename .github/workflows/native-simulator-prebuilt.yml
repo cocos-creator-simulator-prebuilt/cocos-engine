@@ -166,11 +166,13 @@ jobs:
         name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
         path: artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}
 
-    - name: Show exe permissions
+    - name: Show exe permission
       run: |
-        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
-        chmod +x artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
-        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
+        echo "Before modify exe permission"
+        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/SimulatorApp-Mac.app/Contents/MacOS
+        chmod +x artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/SimulatorApp-Mac.app/Contents/MacOS/SimulatorApp-Mac
+        echo "After modify exe permission"
+        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/SimulatorApp-Mac.app/Contents/MacOS
 
     - name: Pack dist files
       if: github.event_name == 'release'
