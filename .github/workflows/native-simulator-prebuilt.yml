@@ -149,19 +149,19 @@ jobs:
     needs: [build_simulator_ts, win_gen_simulator, mac_gen_simulator]
     steps:
     - name: Download native-preview-spine-${{ matrix.config.spine }}
-      uses: actions/download-artifact@v4
+      uses: pyTooling/download-artifact@v4
       with:
         name: native-preview-spine-${{ matrix.config.spine }}
         path: artifacts/native-preview-spine-${{ matrix.config.spine }}
 
     - name: Download SimulatorApp-Win32-spine-${{ matrix.config.spine }}
-      uses: actions/download-artifact@v4
+      uses: pyTooling/download-artifact@v4
       with:
         name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
         path: artifacts/SimulatorApp-Win32-spine-${{ matrix.config.spine }}
 
     - name: Download SimulatorApp-Mac-spine-${{ matrix.config.spine }}
-      uses: actions/download-artifact@v4
+      uses: pyTooling/download-artifact@v4
       with:
         name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
         path: artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}
