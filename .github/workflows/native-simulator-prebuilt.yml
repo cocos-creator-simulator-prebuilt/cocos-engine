@@ -36,7 +36,7 @@ jobs:
           node build-simulator-ts.js ${{ matrix.config.spine }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: pyTooling/upload-artifact@v4
         with: 
           name: native-preview-${{ matrix.config.spine }}
           path: bin
@@ -84,7 +84,7 @@ jobs:
           cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: pyTooling/upload-artifact@v4
         with: 
           name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
           path: dist
@@ -129,7 +129,7 @@ jobs:
           cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: pyTooling/upload-artifact@v4
         with: 
           name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
           path: dist
