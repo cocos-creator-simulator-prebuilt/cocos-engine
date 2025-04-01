@@ -2,6 +2,8 @@ name: Gen Simulator
 
 on:
   push:
+    branches:
+      - '**'
     tags-ignore:
       - '**'
   release:
