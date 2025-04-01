@@ -17,7 +17,7 @@ jobs:
       matrix:
         config:
           - { spine: spine-3.8 }
-          # - { spine: spine-4.2 }
+          - { spine: spine-4.2 }
 
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
           node build-simulator-ts.js ${{ matrix.config.spine }}
 
       - name: Upload Artifact
-        uses: pyTooling/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with: 
           name: native-preview-${{ matrix.config.spine }}
           path: bin
@@ -49,7 +49,7 @@ jobs:
       matrix:
         config:
           - { spine: 3.8 }
-          # - { spine: 4.2 }
+          - { spine: 4.2 }
           
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
           cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
-        uses: pyTooling/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
           path: dist
@@ -97,7 +97,7 @@ jobs:
       matrix:
         config:
           - { spine: 3.8 }
-          # - { spine: 4.2 }
+          - { spine: 4.2 }
     steps:
       - uses: actions/checkout@v4
       - name: npm install
@@ -113,7 +113,7 @@ jobs:
       - name: gen simulator
         run: |
           cd native
-          SPINE_VERSION=${{ matrix.config.spine }} ARCH=arm64 npx gulp gen-simulator-release
+          SPINE_VERSION=${{ matrix.config.spine }} npx gulp gen-simulator-release
 
       - name: check result and make dist
         run: |
@@ -129,7 +129,7 @@ jobs:
           cp -r ./native/simulator/Release dist/
 
       - name: Upload Artifact
-        uses: pyTooling/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with: 
           name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
           path: dist
@@ -143,32 +143,34 @@ jobs:
       matrix:
         config:
           - { spine: 3.8 }
-          # - { spine: 4.2 }
+          - { spine: 4.2 }
     permissions:
       contents: write
     needs: [build_simulator_ts, win_gen_simulator, mac_gen_simulator]
     steps:
     - name: Download native-preview-spine-${{ matrix.config.spine }}
-      uses: pyTooling/download-artifact@v4
+      uses: actions/download-artifact@v4
       with:
         name: native-preview-spine-${{ matrix.config.spine }}
         path: artifacts/native-preview-spine-${{ matrix.config.spine }}
 
     - name: Download SimulatorApp-Win32-spine-${{ matrix.config.spine }}
-      uses: pyTooling/download-artifact@v4
+      uses: actions/download-artifact@v4
       with:
         name: SimulatorApp-Win32-spine-${{ matrix.config.spine }}
         path: artifacts/SimulatorApp-Win32-spine-${{ matrix.config.spine }}
 
     - name: Download SimulatorApp-Mac-spine-${{ matrix.config.spine }}
-      uses: pyTooling/download-artifact@v4
+      uses: actions/download-artifact@v4
       with:
         name: SimulatorApp-Mac-spine-${{ matrix.config.spine }}
         path: artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}
 
     - name: Show exe permissions
       run: |
-        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/SimulatorApp-Mac.app/Contents/MacOS
+        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
+        chmod +x artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
+        ls -l artifacts/SimulatorApp-Mac-spine-${{ matrix.config.spine }}/Release/Release/SimulatorApp-Mac.app/Contents/MacOS
 
     - name: Pack dist files
       if: github.event_name == 'release'
